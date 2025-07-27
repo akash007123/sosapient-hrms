@@ -9,7 +9,21 @@ interface EventItem {
   _id: string;
   title: string;
   date: string;
-  type: 'holiday' | 'employee_birthday' | 'admin_birthday' | 'custom';
+  type: 'holiday' | 'employee_birthday' | 'admin_birthday' | 'custom' | 'leave';
+}
+
+interface LeaveEvent {
+  _id: string;
+  employee_id: {
+    _id: string;
+    first_name: string;
+    last_name: string;
+  };
+  from_date: string;
+  to_date: string;
+  reason: string;
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  is_half_day: boolean;
 }
 
 const typeColors: Record<EventItem['type'], string> = {
@@ -17,6 +31,7 @@ const typeColors: Record<EventItem['type'], string> = {
   employee_birthday: 'text-blue-600',
   admin_birthday: 'text-purple-600',
   custom: 'text-green-600',
+  leave: 'text-red-600',
 };
 
 const typeLabels: Record<EventItem['type'], string> = {
@@ -24,11 +39,13 @@ const typeLabels: Record<EventItem['type'], string> = {
   employee_birthday: "Employee's Birthday",
   admin_birthday: "Admin's Birthday",
   custom: 'Custom Event',
+  leave: 'Leave',
 };
 
 const Events: React.FC = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [events, setEvents] = useState<EventItem[]>([]);
+  const [leaves, setLeaves] = useState<LeaveEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [year, setYear] = useState(new Date().getFullYear());
@@ -38,7 +55,7 @@ const Events: React.FC = () => {
   const [newEventDate, setNewEventDate] = useState('');
   const [adding, setAdding] = useState(false);
 
-  // Fetch both HRMS events and custom events
+  // Fetch both HRMS events, custom events, and leaves
   const fetchEvents = async () => {
     setLoading(true);
     try {
@@ -54,6 +71,7 @@ const Events: React.FC = () => {
         const data = await hrmsRes.json();
         hrmsEvents = data.events || [];
       }
+      
       // Fetch custom events
       const customRes = await fetch('http://localhost:5000/api/events', {
         headers: {
@@ -66,7 +84,28 @@ const Events: React.FC = () => {
         const data = await customRes.json();
         customEvents = (data.events || []).map((e: any) => ({ ...e, type: 'custom' }));
       }
+      
+      // Fetch leaves with role-based filtering
+      const params = new URLSearchParams();
+      if (user?.role === 'employee') {
+        params.append('logged_in_employee_id', user.id);
+        params.append('role', user.role);
+      }
+      
+      const leavesRes = await fetch(`http://localhost:5000/api/leaves?${params.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      let leavesData = [];
+      if (leavesRes.ok) {
+        const data = await leavesRes.json();
+        leavesData = data.leaves || [];
+      }
+      
       setEvents([...hrmsEvents, ...customEvents]);
+      setLeaves(leavesData);
     } catch (err) {
       setError('Error fetching events');
     } finally {
@@ -77,7 +116,26 @@ const Events: React.FC = () => {
   useEffect(() => {
     fetchEvents();
     // eslint-disable-next-line
-  }, [token]);
+  }, [token, user]);
+
+  // Convert leaves to calendar events
+  const leaveEvents = leaves.map(leave => {
+    const fromDate = new Date(leave.from_date);
+    const toDate = new Date(leave.to_date);
+    const events = [];
+    
+    // Create events for each day of the leave period
+    for (let d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
+      events.push({
+        _id: `${leave._id}_${d.toISOString().split('T')[0]}`,
+        title: ` ${leave.reason}`,
+        date: d.toISOString().split('T')[0],
+        type: 'leave' as const,
+        leaveData: leave
+      });
+    }
+    return events;
+  }).flat();
 
   // Filter events by year and type
   const filteredEvents = events.filter(event => {
@@ -87,11 +145,21 @@ const Events: React.FC = () => {
     return yearMatch && typeMatch;
   });
 
-  // Sort filteredEvents in descending order by date
-  const sortedEvents = [...filteredEvents].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  // Filter leave events by year and type
+  const filteredLeaveEvents = leaveEvents.filter(event => {
+    const eventYear = new Date(event.date).getFullYear();
+    const yearMatch = eventYear === Number(year);
+    const typeMatch = filter === 'all' ? true : event.type === filter;
+    return yearMatch && typeMatch;
+  });
 
-  // Get unique years from events for dropdown
-  const years = Array.from(new Set(events.map(e => new Date(e.date).getFullYear())));
+  // Combine all events and sort
+  const allEvents = [...filteredEvents, ...filteredLeaveEvents];
+  const sortedEvents = [...allEvents].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+  // Get unique years from all events for dropdown
+  const allEventYears = [...events, ...leaveEvents].map(e => new Date(e.date).getFullYear());
+  const years = Array.from(new Set(allEventYears));
   if (!years.includes(new Date().getFullYear())) years.push(new Date().getFullYear());
   years.sort((a, b) => a - b);
 
@@ -231,14 +299,24 @@ const Events: React.FC = () => {
             {sortedEvents.length === 0 ? (
               <div className="text-center text-gray-500 py-8">No events found</div>
             ) : (
-              <ul className="space-y-4">
-                {sortedEvents.map(event => (
-                  <li key={event._id} className="flex flex-col border-l-4 pl-3" style={{ borderColor: event.type === 'holiday' ? '#e11d48' : event.type === 'employee_birthday' ? '#2563eb' : event.type === 'custom' ? '#22c55e' : '#a21caf' }}>
-                    <span className={`font-semibold text-base ${typeColors[event.type] || 'text-green-600'}`}>{event.title}</span>
-                    <span className="text-xs text-gray-500">{new Date(event.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                  </li>
-                ))}
-              </ul>
+                          <ul className="space-y-4">
+              {sortedEvents.map(event => (
+                <li key={event._id} className="flex flex-col border-l-4 pl-3" style={{ 
+                  borderColor: event.type === 'holiday' ? '#e11d48' : 
+                             event.type === 'employee_birthday' ? '#2563eb' : 
+                             event.type === 'custom' ? '#22c55e' : 
+                             event.type === 'leave' ? '#f97316' : '#a21caf' 
+                }}>
+                  <span className={`font-semibold text-base ${typeColors[event.type] || 'text-green-600'}`}>{event.title}</span>
+                  <span className="text-xs text-gray-500">{new Date(event.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  {event.type === 'leave' && (event as any).leaveData && (
+                    <span className="text-xs text-gray-400">
+                      Status: {(event as any).leaveData.status} • {(event as any).leaveData.is_half_day ? 'Half Day' : 'Full Day'}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
             )}
           </div>
         </div>
@@ -256,37 +334,49 @@ const Events: React.FC = () => {
               <option value="employee_birthday">Employee's Birthday</option>
               <option value="admin_birthday">Admin's Birthday</option>
               <option value="holiday">Holiday</option>
+              <option value="leave">Leave</option>
             </select>
           </div>
           <div className="p-4">
             <FullCalendar
               plugins={[dayGridPlugin, interactionPlugin]}
               initialView="dayGridMonth"
-              events={filteredEvents
-                .filter(event => ['employee_birthday', 'admin_birthday', 'holiday', 'custom'].includes(event.type))
-                .map(event => ({
+              events={[
+                ...filteredEvents
+                  .filter(event => ['employee_birthday', 'admin_birthday', 'holiday', 'custom'].includes(event.type))
+                  .map(event => ({
+                    id: event._id,
+                    title: event.title,
+                    start: event.date,
+                    allDay: true,
+                    backgroundColor:
+                      event.type === 'holiday'
+                        ? '#e11d48'
+                        : event.type === 'employee_birthday'
+                        ? '#2563eb'
+                        : event.type === 'custom'
+                        ? '#22c55e'
+                        : '#a21caf',
+                    borderColor:
+                      event.type === 'holiday'
+                        ? '#e11d48'
+                        : event.type === 'employee_birthday'
+                        ? '#2563eb'
+                        : event.type === 'custom'
+                        ? '#22c55e'
+                        : '#a21caf',
+                    textColor: '#fff',
+                  })),
+                ...filteredLeaveEvents.map(event => ({
                   id: event._id,
                   title: event.title,
                   start: event.date,
-                  allDay: true, // Ensure no time is shown
-                  backgroundColor:
-                    event.type === 'holiday'
-                      ? '#e11d48'
-                      : event.type === 'employee_birthday'
-                      ? '#2563eb'
-                      : event.type === 'custom'
-                      ? '#22c55e'
-                      : '#a21caf',
-                  borderColor:
-                    event.type === 'holiday'
-                      ? '#e11d48'
-                      : event.type === 'employee_birthday'
-                      ? '#2563eb'
-                      : event.type === 'custom'
-                      ? '#22c55e'
-                      : '#a21caf',
+                  allDay: true,
+                  backgroundColor: '#f97316',
+                  borderColor: '#f97316',
                   textColor: '#fff',
-                }))}
+                }))
+              ]}
               headerToolbar={{
                 left: 'prev,next today',
                 center: 'title',

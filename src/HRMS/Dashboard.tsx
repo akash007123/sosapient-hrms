@@ -53,19 +53,29 @@ const ProfileImage: React.FC<{
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
+    console.log('ProfileImage debug:', { profile, firstName, lastName });
+    
     if (profile && profile.startsWith('http')) {
+      console.log('Using full URL:', profile);
       setImageSrc(profile);
     } else if (profile) {
-      setImageSrc(`http://localhost:5000/uploads/profiles/${profile}`);
+      const profilePath = `http://localhost:5000/uploads/profiles/${profile}`;
+      console.log('Using profile path:', profilePath);
+      setImageSrc(profilePath);
     } else {
-      setImageSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=32`);
+      const initialsUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=32`;
+      console.log('Using initials URL:', initialsUrl);
+      setImageSrc(initialsUrl);
     }
   }, [profile, firstName, lastName]);
 
   const handleError = () => {
+    console.log('ProfileImage error for:', { profile, firstName, lastName, currentSrc: imageSrc });
     if (!hasError) {
       setHasError(true);
-      setImageSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=32`);
+      const initialsUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=32`;
+      console.log('Falling back to initials URL:', initialsUrl);
+      setImageSrc(initialsUrl);
     }
   };
 
@@ -96,8 +106,24 @@ const Dashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      // Fetch projects
-      const projectsResponse = await fetch('http://localhost:5000/api/projects', {
+      // Fetch projects based on user role (similar to reference Dashboard.js)
+      let projectsUrl = 'http://localhost:5000/api/projects';
+      
+      // Add query parameters like reference Dashboard.js
+      const params = new URLSearchParams();
+      if (user?.role === 'employee') {
+        params.append('logged_in_employee_id', user.id);
+        params.append('role', user.role);
+      }
+      
+      if (params.toString()) {
+        projectsUrl += `?${params.toString()}`;
+      }
+
+      console.log('Dashboard - User info:', { id: user?.id, role: user?.role });
+      console.log('Dashboard - Projects URL:', projectsUrl);
+
+      const projectsResponse = await fetch(projectsUrl, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -107,6 +133,7 @@ const Dashboard: React.FC = () => {
       if (projectsResponse.ok) {
         const projectsData = await projectsResponse.json();
         console.log('Projects data:', projectsData);
+        console.log('First project team members:', projectsData.projects?.[0]?.team_members);
         setProjects(projectsData.projects || []);
       }
 
@@ -135,9 +162,14 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchDashboardData();
-  }, [token]);
+  }, [token, user]);
 
   const renderStatCards = () => {
+    // Only show stats cards for admin users (similar to reference Dashboard.js)
+    if (!(user?.role === 'admin')) {
+      return null;
+    }
+
     const items = [
       { 
         label: 'Users', 
@@ -206,15 +238,22 @@ const Dashboard: React.FC = () => {
           <h2 className="text-xl text-gray-700">
             Welcome {user?.first_name} {user?.last_name}!
           </h2>
+          {user?.role === 'employee' && (
+            <p className="text-sm text-gray-500 mt-1">
+              You can view your assigned projects and clients below.
+            </p>
+          )}
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats Cards - Only for Admin/Super Admin */}
         {renderStatCards()}
 
         {/* Project Summary Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">PROJECT SUMMARY</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              {user?.role === 'employee' ? 'MY ASSIGNED PROJECTS' : 'PROJECT SUMMARY'}
+            </h3>
           </div>
           <div className="overflow-x-auto">
             {loading ? (
@@ -293,8 +332,12 @@ const Dashboard: React.FC = () => {
                   ) : (
                     <tr>
                       <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                        <div className="text-4xl mb-2">📁</div>
-                        <p>No projects available</p>
+                        <p>
+                          {user?.role === 'employee' 
+                            ? 'No projects available' 
+                            : 'No projects available'
+                          }
+                        </p>
                       </td>
                     </tr>
                   )}

@@ -536,11 +536,7 @@ const ProjectList: React.FC = () => {
   ) : (
     <div className="col-span-full text-center py-12">
       <div className="text-gray-500">
-        <div className="text-4xl mb-4">📁</div>
-        <h3 className="text-lg font-medium mb-2">No projects found</h3>
-        <p className="text-gray-400">
-          Get started by adding your first project.
-        </p>
+        <h3 className="text-lg font-medium mb-2">No projects available</h3>
       </div>
     </div>
   )}

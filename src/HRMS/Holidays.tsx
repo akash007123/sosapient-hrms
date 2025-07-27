@@ -10,7 +10,7 @@ interface Holiday {
 }
 
 const Holidays: React.FC = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -234,22 +234,24 @@ const Holidays: React.FC = () => {
         </div>
       </div>
 
-      {/* Action Bar */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">Holiday List</h2>
-            <p className="text-gray-600">Manage all company holidays</p>
+      {/* Action Bar - Only show for admin */}
+      {user?.role === 'admin' && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">Holiday List</h2>
+              <p className="text-gray-600">Manage all company holidays</p>
+            </div>
+            <button
+              onClick={handleOpenAdd}
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-200 flex items-center gap-2"
+            >
+              <span>+</span>
+              Add Holiday
+            </button>
           </div>
-          <button
-            onClick={handleOpenAdd}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-200 flex items-center gap-2"
-          >
-            <span>+</span>
-            Add Holiday
-          </button>
         </div>
-      </div>
+      )}
 
       {/* Error Message */}
       {error && (
@@ -275,20 +277,25 @@ const Holidays: React.FC = () => {
                   Holiday
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Day
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Date
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
+                {user?.role === 'admin' && (
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {holidays.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center">
+                  <td colSpan={user?.role === 'admin' ? 5 : 4} className="px-6 py-12 text-center">
                     <div className="text-gray-500">
                       <span className="text-4xl mb-4 block">🎉</span>
                       <p className="text-lg font-medium">No holidays found</p>
@@ -311,6 +318,11 @@ const Holidays: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 font-medium">
+                          {holidayDate.toLocaleDateString('en-US', { weekday: 'long' })}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
                           {formatDate(holiday.date)}
                         </div>
@@ -326,22 +338,24 @@ const Holidays: React.FC = () => {
                           {isToday ? 'Today' : isPast ? 'Past' : 'Upcoming'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => handleOpenEdit(holiday)}
-                            className="text-blue-600 hover:text-blue-900 font-medium"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(holiday._id, holiday.title)}
-                            className="text-red-600 hover:text-red-900 font-medium"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
+                      {user?.role === 'admin' && (
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => handleOpenEdit(holiday)}
+                              className="text-blue-600 hover:text-blue-900 font-medium"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(holiday._id, holiday.title)}
+                              className="text-red-600 hover:text-red-900 font-medium"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   );
                 })
@@ -351,8 +365,8 @@ const Holidays: React.FC = () => {
         </div>
       </div>
 
-      {/* Add/Edit Modal */}
-      {showModal && (
+      {/* Add/Edit Modal - Only show for admin */}
+      {showModal && user?.role === 'admin' && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto transform transition-all duration-300 scale-100">
             <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-6 rounded-t-xl">
@@ -410,8 +424,8 @@ const Holidays: React.FC = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
-      {deleteId && (
+      {/* Delete Confirmation Modal - Only show for admin */}
+      {deleteId && user?.role === 'admin' && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-auto transform transition-all duration-300 scale-100">
             <div className="bg-gradient-to-r from-red-600 to-red-700 p-6 rounded-t-xl">

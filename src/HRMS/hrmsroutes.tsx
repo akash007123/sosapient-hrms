@@ -13,6 +13,7 @@ import Fixnav from './fixnav';
 import Events from './Events';
 import Clients from './Clients';
 import ProjectList from './ProjectList';
+import Leaves from './Leaves';
 
 const HRMSRoutes: React.FC = () => (
   <Routes>
@@ -29,6 +30,7 @@ const HRMSRoutes: React.FC = () => (
     <Route path="events" element={<Events />} />
     <Route path="clients" element={<Clients />} />
     <Route path="project-list" element={<ProjectList />} />
+    <Route path="leaves" element={<Leaves />} />
   </Routes>
 );
 
