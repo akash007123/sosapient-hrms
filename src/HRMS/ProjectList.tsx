@@ -50,7 +50,7 @@ const ProfileImage: React.FC<{
     if (profile && profile.startsWith('http')) {
       setImageSrc(profile);
     } else if (profile) {
-      setImageSrc(`http://localhost:5000/uploads/profiles/${profile}`);
+      setImageSrc(`${import.meta.env.VITE_BASE_URL}/uploads/profiles/${profile}`);
     } else {
       setImageSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=32`);
     }
@@ -112,7 +112,7 @@ const ProjectList: React.FC = () => {
   const fetchProjects = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/projects', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/projects`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ const ProjectList: React.FC = () => {
   // Fetch clients for dropdown
   const fetchClients = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/projects/dropdown/clients', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/projects/dropdown/clients`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ const ProjectList: React.FC = () => {
   // Fetch employees for team selection
   const fetchEmployees = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/projects/dropdown/employees', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/projects/dropdown/employees`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -270,8 +270,8 @@ const ProjectList: React.FC = () => {
     setSubmitting(true);
     try {
       const url = showEditModal && selectedProject 
-        ? `http://localhost:5000/api/projects/${selectedProject._id}`
-        : 'http://localhost:5000/api/projects';
+        ? `${import.meta.env.VITE_BASE_URL}/api/projects/${selectedProject._id}`
+        : `${import.meta.env.VITE_BASE_URL}/api/projects`;
       
       const method = showEditModal ? 'PUT' : 'POST';
 
@@ -306,7 +306,7 @@ const ProjectList: React.FC = () => {
     if (!selectedProject) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/projects/${selectedProject._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/projects/${selectedProject._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

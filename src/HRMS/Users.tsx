@@ -59,7 +59,7 @@ const Users: React.FC = () => {
   const fetchAdmins = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/hrms/admins', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/hrms/admins`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ const Users: React.FC = () => {
   // Fetch departments
   const fetchDepartments = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/departments', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/departments`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ const Users: React.FC = () => {
         formData.append('profile', addFormData.profile);
       }
 
-      const response = await fetch('http://localhost:5000/api/hrms/admins', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/hrms/admins`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -226,7 +226,7 @@ const Users: React.FC = () => {
         formData.append('profile', editFormData.profile);
       }
 
-      const response = await fetch(`http://localhost:5000/api/hrms/admins/${selectedAdmin._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/hrms/admins/${selectedAdmin._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -263,7 +263,7 @@ const Users: React.FC = () => {
     if (!adminToDelete) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/hrms/admins/${adminToDelete._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/hrms/admins/${adminToDelete._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -418,7 +418,7 @@ const Users: React.FC = () => {
                       <div className="flex items-center">
                         {admin.profile && admin.profile.startsWith('/uploads/') ? (
                           <img 
-                            src={`http://localhost:5000${admin.profile}`} 
+                            src={`${import.meta.env.VITE_BASE_URL}${admin.profile}`} 
                             alt="Profile" 
                             className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
                             onError={(e) => {
@@ -669,7 +669,7 @@ const Users: React.FC = () => {
                   <div className="flex items-center space-x-3">
                     {selectedAdmin.profile && selectedAdmin.profile.startsWith('/uploads/') ? (
                       <img 
-                        src={`http://localhost:5000${selectedAdmin.profile}`} 
+                        src={`${import.meta.env.VITE_BASE_URL}${selectedAdmin.profile}`} 
                         alt="Profile" 
                         className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
                         onError={(e) => {

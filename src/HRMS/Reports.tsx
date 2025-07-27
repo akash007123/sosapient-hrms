@@ -132,7 +132,7 @@ const Reports: React.FC = () => {
         params.append('employee_id', selectedEmployee);
       }
 
-      const response = await fetch(`http://localhost:5000/api/reports?${params.toString()}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/reports?${params.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ const Reports: React.FC = () => {
   // Fetch employees
   const fetchEmployees = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/employees', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/employees`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -211,7 +211,7 @@ const Reports: React.FC = () => {
       const calculatedWorkingHours = calculateWorkingHours(startTime, endTime, breakDuration);
       const calculatedTotalHours = calculateTotalHours(startTime, endTime);
       
-      const response = await fetch(`http://localhost:5000/api/reports/${selectedReport.id}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/reports/${selectedReport.id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -293,7 +293,7 @@ const Reports: React.FC = () => {
       const calculatedWorkingHours = calculateWorkingHours(submitStartTime, submitEndTime, submitBreakDuration);
       const calculatedTotalHours = calculateTotalHours(submitStartTime, submitEndTime);
       
-      const res = await fetch('http://localhost:5000/api/reports', {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/reports`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

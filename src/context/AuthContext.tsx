@@ -54,7 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Check if userData is FormData (for file uploads) or regular object
       const isFormData = userData instanceof FormData;
       
-      const response = await fetch('http://localhost:5000/api/auth/signup', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/signup`, {
         method: 'POST',
         headers: isFormData ? {} : {
           'Content-Type': 'application/json',

@@ -60,7 +60,7 @@ const Events: React.FC = () => {
     setLoading(true);
     try {
       // Fetch HRMS events (holidays, birthdays)
-      const hrmsRes = await fetch('http://localhost:5000/api/hrms/events', {
+      const hrmsRes = await fetch(`${import.meta.env.VITE_BASE_URL}/api/hrms/events`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ const Events: React.FC = () => {
       }
       
       // Fetch custom events
-      const customRes = await fetch('http://localhost:5000/api/events', {
+      const customRes = await fetch(`${import.meta.env.VITE_BASE_URL}/api/events`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ const Events: React.FC = () => {
         params.append('role', user.role);
       }
       
-      const leavesRes = await fetch(`http://localhost:5000/api/leaves?${params.toString()}`, {
+      const leavesRes = await fetch(`${import.meta.env.VITE_BASE_URL}/api/leaves?${params.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ const Events: React.FC = () => {
     if (!newEventTitle || !newEventDate) return;
     setAdding(true);
     try {
-      const res = await fetch('http://localhost:5000/api/events', {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/events`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -25,7 +25,7 @@ const Departments: React.FC = () => {
   const fetchDepartments = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/departments', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/departments`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ const Departments: React.FC = () => {
   const confirmDelete = async () => {
     if (!deleteId) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/departments/${deleteId}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/departments/${deleteId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -101,7 +101,7 @@ const Departments: React.FC = () => {
     if (editId) {
       // Edit department
       try {
-        const response = await fetch(`http://localhost:5000/api/departments/${editId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/departments/${editId}`, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -122,7 +122,7 @@ const Departments: React.FC = () => {
     } else {
       // Add department
       try {
-        const response = await fetch('http://localhost:5000/api/departments', {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/departments`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

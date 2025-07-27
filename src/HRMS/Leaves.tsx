@@ -49,7 +49,7 @@ const ProfileImage: React.FC<{
     if (profile && profile.startsWith('http')) {
       setImageSrc(profile);
     } else if (profile) {
-      setImageSrc(`http://localhost:5000/uploads/profiles/${profile}`);
+      setImageSrc(`${import.meta.env.VITE_BASE_URL}/uploads/profiles/${profile}`);
     } else {
       setImageSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=32`);
     }
@@ -137,7 +137,7 @@ const Leaves: React.FC = () => {
         params.append('role', user.role);
       }
 
-      const response = await fetch(`http://localhost:5000/api/leaves?${params.toString()}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/leaves?${params.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -161,7 +161,7 @@ const Leaves: React.FC = () => {
   // Fetch employees for dropdown
   const fetchEmployees = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/leaves/dropdown/employees', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/leaves/dropdown/employees`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -186,7 +186,7 @@ const Leaves: React.FC = () => {
         params.append('role', user.role);
       }
 
-      const response = await fetch(`http://localhost:5000/api/leaves/stats?${params.toString()}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/leaves/stats?${params.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -244,7 +244,7 @@ const Leaves: React.FC = () => {
   const confirmDelete = async () => {
     if (!deleteId) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/leaves/${deleteId}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/leaves/${deleteId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -289,8 +289,8 @@ const Leaves: React.FC = () => {
     e.preventDefault();
     try {
       const url = editId 
-        ? `http://localhost:5000/api/leaves/${editId}`
-        : 'http://localhost:5000/api/leaves';
+        ? `${import.meta.env.VITE_BASE_URL}/api/leaves/${editId}`
+        : `${import.meta.env.VITE_BASE_URL}/api/leaves`;
       
       const method = editId ? 'PUT' : 'POST';
       

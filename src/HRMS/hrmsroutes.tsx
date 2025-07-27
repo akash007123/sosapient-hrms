@@ -14,6 +14,7 @@ import Events from './Events';
 import Clients from './Clients';
 import ProjectList from './ProjectList';
 import Leaves from './Leaves';
+import Link from './Link';
 
 const HRMSRoutes: React.FC = () => (
   <Routes>
@@ -31,6 +32,7 @@ const HRMSRoutes: React.FC = () => (
     <Route path="clients" element={<Clients />} />
     <Route path="project-list" element={<ProjectList />} />
     <Route path="leaves" element={<Leaves />} />
+    <Route path="links" element={<Link />} />
   </Routes>
 );
 

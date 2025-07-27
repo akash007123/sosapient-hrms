@@ -76,7 +76,7 @@ const AuthSignUp: React.FC = () => {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/hrms/departments');
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/hrms/departments`);
         if (response.ok) {
           const data = await response.json();
           setDepartments(data.departments || []);

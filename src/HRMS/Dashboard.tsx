@@ -59,7 +59,7 @@ const ProfileImage: React.FC<{
       console.log('Using full URL:', profile);
       setImageSrc(profile);
     } else if (profile) {
-      const profilePath = `http://localhost:5000/uploads/profiles/${profile}`;
+      const profilePath = `${import.meta.env.VITE_BASE_URL}/uploads/profiles/${profile}`;
       console.log('Using profile path:', profilePath);
       setImageSrc(profilePath);
     } else {
@@ -107,7 +107,7 @@ const Dashboard: React.FC = () => {
     setLoading(true);
     try {
       // Fetch projects based on user role (similar to reference Dashboard.js)
-      let projectsUrl = 'http://localhost:5000/api/projects';
+      let projectsUrl = `${import.meta.env.VITE_BASE_URL}/api/projects`;
       
       // Add query parameters like reference Dashboard.js
       const params = new URLSearchParams();
@@ -138,7 +138,7 @@ const Dashboard: React.FC = () => {
       }
 
       // Fetch dashboard stats
-      const statsResponse = await fetch('http://localhost:5000/api/dashboard/stats', {
+              const statsResponse = await fetch(`${import.meta.env.VITE_BASE_URL}/api/dashboard/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

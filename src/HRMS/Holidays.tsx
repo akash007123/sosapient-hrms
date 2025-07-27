@@ -24,7 +24,7 @@ const Holidays: React.FC = () => {
   const fetchHolidays = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/hrms/holidays', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/hrms/holidays`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ const Holidays: React.FC = () => {
   const confirmDelete = async () => {
     if (!deleteId) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/hrms/holidays/${deleteId}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/hrms/holidays/${deleteId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -102,7 +102,7 @@ const Holidays: React.FC = () => {
     if (editId) {
       // Edit holiday
       try {
-        const response = await fetch(`http://localhost:5000/api/hrms/holidays/${editId}`, {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/hrms/holidays/${editId}`, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -123,7 +123,7 @@ const Holidays: React.FC = () => {
     } else {
       // Add holiday
       try {
-        const response = await fetch('http://localhost:5000/api/hrms/holidays', {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/hrms/holidays`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

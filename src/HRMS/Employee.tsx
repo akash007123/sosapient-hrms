@@ -62,7 +62,7 @@ const Employee: React.FC = () => {
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/hrms/employees', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/hrms/employees`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ const Employee: React.FC = () => {
   // Fetch departments
   const fetchDepartments = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/departments', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/departments`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -191,7 +191,7 @@ const Employee: React.FC = () => {
         formData.append('profile', addFormData.profile);
       }
 
-      const response = await fetch('http://localhost:5000/api/hrms/employees', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/hrms/employees`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -242,7 +242,7 @@ const Employee: React.FC = () => {
         formData.append('profile', editFormData.profile);
       }
 
-      const response = await fetch(`http://localhost:5000/api/hrms/employees/${selectedEmployee._id}`, {
+              const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/hrms/employees/${selectedEmployee._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -279,7 +279,7 @@ const Employee: React.FC = () => {
     if (!employeeToDelete) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/hrms/employees/${employeeToDelete._id}`, {
+              const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/hrms/employees/${employeeToDelete._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -441,7 +441,7 @@ const Employee: React.FC = () => {
                       <div className="flex items-center">
                         {employee.profile && employee.profile.startsWith('/uploads/') ? (
                           <img 
-                            src={`http://localhost:5000${employee.profile}`} 
+                            src={`${import.meta.env.VITE_BASE_URL}${employee.profile}`} 
                             alt="Profile" 
                             className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
                             onError={(e) => {
@@ -552,7 +552,7 @@ const Employee: React.FC = () => {
                   <div className="flex items-center space-x-3">
                     {selectedEmployee.profile && selectedEmployee.profile.startsWith('/uploads/') ? (
                       <img 
-                        src={`http://localhost:5000${selectedEmployee.profile}`} 
+                        src={`${import.meta.env.VITE_BASE_URL}${selectedEmployee.profile}`} 
                         alt="Profile" 
                         className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
                         onError={(e) => {

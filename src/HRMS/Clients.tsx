@@ -30,7 +30,7 @@ const ProfileImage: React.FC<{
     if (profile && profile.startsWith('http')) {
       setImageSrc(profile);
     } else if (profile) {
-      setImageSrc(`http://localhost:5000/uploads/profiles/${profile}`);
+      setImageSrc(`${import.meta.env.VITE_BASE_URL}/uploads/profiles/${profile}`);
     } else {
       setImageSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=24`);
     }
@@ -96,7 +96,7 @@ const Clients: React.FC = () => {
   const fetchClients = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/clients", {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/clients`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -216,7 +216,7 @@ const Clients: React.FC = () => {
     setProjectError("");
     
     try {
-      const response = await fetch(`http://localhost:5000/api/projects/client/${clientId}`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/projects/client/${clientId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -271,8 +271,8 @@ const Clients: React.FC = () => {
 
       const url =
         showEditModal && selectedClient
-          ? `http://localhost:5000/api/clients/${selectedClient.id}`
-          : "http://localhost:5000/api/clients";
+          ? `${import.meta.env.VITE_BASE_URL}/api/clients/${selectedClient.id}`
+          : `${import.meta.env.VITE_BASE_URL}/api/clients`;
 
       const method = showEditModal ? "PUT" : "POST";
 
@@ -311,7 +311,7 @@ const Clients: React.FC = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/clients/${selectedClient.id}`,
+        `${import.meta.env.VITE_BASE_URL}/api/clients/${selectedClient.id}`,
         {
           method: "DELETE",
           headers: {

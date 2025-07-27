@@ -17,6 +17,7 @@ const Sidenav: React.FC = () => {
           { label: 'Employee', path: '/hrms/employee' },
           { label: 'Statistics', path: '/hrms/statistics' },
           { label: 'Leaves', path: '/hrms/leaves' },
+          { label: 'Links', path: '/hrms/links' },
         ]
       : []),
     { label: 'Activities', path: '/hrms/activities' },
