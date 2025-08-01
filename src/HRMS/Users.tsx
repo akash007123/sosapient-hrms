@@ -542,7 +542,6 @@ const Users: React.FC = () => {
                     value={addFormData.department}
                     onChange={handleAddFormChange}
                     className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200"
-                    required
                   >
                     <option value="">Select Department</option>
                     {departments.map((dept) => (
@@ -754,9 +753,7 @@ const Users: React.FC = () => {
                     name="department"
                     value={editFormData.department}
                     onChange={handleEditFormChange}
-                    className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200"
-                    required
-                  >
+                    className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200">
                     <option value="">Select Department</option>
                     {departments.map((dept) => (
                       <option key={dept._id} value={dept.name}>

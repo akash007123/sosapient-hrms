@@ -200,7 +200,7 @@ const AuthSignUp: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {role === 'employee' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <select name="department" value={employee.department} onChange={handleChange} className="p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200" required>
+              <select name="department" value={employee.department} onChange={handleChange} className="p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200">
                 <option value="">Select Department</option>
                 {departments.map((dept) => (
                   <option key={dept._id} value={dept.name}>
@@ -264,7 +264,7 @@ const AuthSignUp: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <select name="department" value={admin.department} onChange={handleChange} className="p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200" required>
+              <select name="department" value={admin.department} onChange={handleChange} className="p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-200">
                 <option value="">Select Department</option>
                 {departments.map((dept) => (
                   <option key={dept._id} value={dept.name}>

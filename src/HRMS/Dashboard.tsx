@@ -59,7 +59,10 @@ const ProfileImage: React.FC<{
       console.log('Using full URL:', profile);
       setImageSrc(profile);
     } else if (profile) {
-      const profilePath = `${import.meta.env.VITE_BASE_URL}/uploads/profiles/${profile}`;
+      // Handle both relative paths (starting with /) and just filenames
+      const profilePath = profile.startsWith('/') 
+        ? `${import.meta.env.VITE_BASE_URL}${profile}`
+        : `${import.meta.env.VITE_BASE_URL}/uploads/profiles/${profile}`;
       console.log('Using profile path:', profilePath);
       setImageSrc(profilePath);
     } else {

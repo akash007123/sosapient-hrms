@@ -15,6 +15,8 @@ import Clients from './Clients';
 import ProjectList from './ProjectList';
 import Leaves from './Leaves';
 import Link from './Link';
+import Statistics from './Statistics';
+import EmployeeReports from './EmployeeReports';
 
 const HRMSRoutes: React.FC = () => (
   <Routes>
@@ -24,6 +26,8 @@ const HRMSRoutes: React.FC = () => (
     <Route path="employee" element={<Employee />} />
     <Route path="holidays" element={<Holidays />} />
     <Route path="reports" element={<Reports />} />
+    <Route path="statistics" element={<Statistics />} />
+    <Route path="employee-reports" element={<EmployeeReports />} />
     <Route path="todo-list" element={<TodoList />} />
     <Route path="gallery" element={<Gallery />} />
     <Route path="sidenav" element={<Sidenav />} />

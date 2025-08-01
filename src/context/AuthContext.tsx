@@ -41,6 +41,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const storedToken = localStorage.getItem('hrms_token');
     const storedUser = localStorage.getItem('hrms_user');
     
+    console.log('AuthContext: Checking stored credentials');
+    console.log('Stored token:', storedToken ? 'Present' : 'Missing');
+    console.log('Stored user:', storedUser ? 'Present' : 'Missing');
+    
     if (storedToken && storedUser) {
       const userData = JSON.parse(storedUser);
       setToken(storedToken);
@@ -48,12 +52,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Also set userRole and userId for compatibility with Reports component
       localStorage.setItem('userRole', userData.role);
       localStorage.setItem('userId', userData.id);
+      console.log('AuthContext: Restored user session:', userData.email);
+    } else {
+      console.log('AuthContext: No stored credentials found');
     }
     setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
+      console.log('AuthContext: Attempting login to:', `${import.meta.env.VITE_BASE_URL}/api/auth/login`);
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -62,9 +70,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log('AuthContext: Login response status:', response.status);
+
       if (response.ok) {
         const data = await response.json();
-        console.log('Login response data:', data); // Debug log
+        console.log('AuthContext: Login response data:', data); // Debug log
         setToken(data.token);
         setUser(data.user);
         localStorage.setItem('hrms_token', data.token);
@@ -72,16 +82,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Also set userRole and userId for compatibility with Reports component
         localStorage.setItem('userRole', data.user.role);
         localStorage.setItem('userId', data.user.id);
-        console.log('Set localStorage userRole:', data.user.role); // Debug log
-        console.log('Set localStorage userId:', data.user.id); // Debug log
+        console.log('AuthContext: Set localStorage userRole:', data.user.role); // Debug log
+        console.log('AuthContext: Set localStorage userId:', data.user.id); // Debug log
         return true;
       } else {
         const error = await response.json();
+        console.log('AuthContext: Login failed:', error);
         alert(error.message || 'Login failed');
         return false;
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('AuthContext: Login error:', error);
       alert('Login failed. Please try again.');
       return false;
     }

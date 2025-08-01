@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import Modal from 'react-modal';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Modal from "react-modal";
 
 interface Report {
   id: string;
@@ -29,71 +29,90 @@ const Reports: React.FC = () => {
   const [reports, setReports] = useState<Report[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  
-  console.log('Reports component - token:', token);
-  console.log('Reports component - localStorage userRole:', localStorage.getItem('userRole'));
-  console.log('Reports component - localStorage userId:', localStorage.getItem('userId'));
-  
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  console.log("Reports component - token:", token);
+  console.log(
+    "Reports component - localStorage userRole:",
+    localStorage.getItem("userRole")
+  );
+  console.log(
+    "Reports component - localStorage userId:",
+    localStorage.getItem("userId")
+  );
+
   // Filter states
-  const [fromDate, setFromDate] = useState<Date | null>(new Date(Date.now() - 24 * 60 * 60 * 1000));
+  const [fromDate, setFromDate] = useState<Date | null>(
+    new Date(Date.now() - 24 * 60 * 60 * 1000)
+  );
   const [toDate, setToDate] = useState<Date | null>(new Date());
-  const [selectedEmployee, setSelectedEmployee] = useState('');
+  const [selectedEmployee, setSelectedEmployee] = useState("");
   const [buttonLoading, setButtonLoading] = useState(false);
-  
+
   // Modal states
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  
+
   // Form states
-  const [report, setReport] = useState('');
+  const [report, setReport] = useState("");
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [breakDuration, setBreakDuration] = useState(0);
-  const [workingHours, setWorkingHours] = useState('');
-  const [totalHours, setTotalHours] = useState('');
-  const [note, setNote] = useState('');
+  const [workingHours, setWorkingHours] = useState("");
+  const [totalHours, setTotalHours] = useState("");
+  const [note, setNote] = useState("");
   // Submission form states
-  const [submitReport, setSubmitReport] = useState('');
+  const [submitReport, setSubmitReport] = useState("");
   const [submitStartTime, setSubmitStartTime] = useState<Date | null>(null);
   const [submitEndTime, setSubmitEndTime] = useState<Date | null>(null);
   const [submitBreakDuration, setSubmitBreakDuration] = useState(0);
-  const [submitNote, setSubmitNote] = useState('');
+  const [submitNote, setSubmitNote] = useState("");
   const [submitLoading, setSubmitLoading] = useState(false);
-  
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [dataPerPage] = useState(10);
 
   // Timing calculation functions
-  const calculateWorkingHours = (start: Date | null, end: Date | null, breakMinutes: number): string => {
-    if (!start || !end) return '';
-    
+  const calculateWorkingHours = (
+    start: Date | null,
+    end: Date | null,
+    breakMinutes: number
+  ): string => {
+    if (!start || !end) return "";
+
     const diffMs = end.getTime() - start.getTime();
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
     const workingMinutes = diffMinutes - breakMinutes;
-    
-    if (workingMinutes < 0) return '00:00';
-    
+
+    if (workingMinutes < 0) return "00:00";
+
     const hours = Math.floor(workingMinutes / 60);
     const minutes = workingMinutes % 60;
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}`;
   };
 
-  const calculateTotalHours = (start: Date | null, end: Date | null): string => {
-    if (!start || !end) return '';
-    
+  const calculateTotalHours = (
+    start: Date | null,
+    end: Date | null
+  ): string => {
+    if (!start || !end) return "";
+
     const diffMs = end.getTime() - start.getTime();
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    
-    if (diffMinutes < 0) return '00:00';
-    
+
+    if (diffMinutes < 0) return "00:00";
+
     const hours = Math.floor(diffMinutes / 60);
     const minutes = diffMinutes % 60;
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   // Update calculated times for edit modal
@@ -106,7 +125,11 @@ const Reports: React.FC = () => {
 
   // Update calculated times for submit modal
   useEffect(() => {
-    const working = calculateWorkingHours(submitStartTime, submitEndTime, submitBreakDuration);
+    const working = calculateWorkingHours(
+      submitStartTime,
+      submitEndTime,
+      submitBreakDuration
+    );
     const total = calculateTotalHours(submitStartTime, submitEndTime);
     // These will be used when submitting the report
   }, [submitStartTime, submitEndTime, submitBreakDuration]);
@@ -116,37 +139,40 @@ const Reports: React.FC = () => {
     setLoading(true);
     try {
       const formatDate = (date: Date | null) => {
-        if (!date) return '';
-        return date.toISOString().split('T')[0];
+        if (!date) return "";
+        return date.toISOString().split("T")[0];
       };
 
       // Build query parameters
       const params = new URLSearchParams({
         from_date: formatDate(fromDate),
-        to_date: formatDate(toDate)
+        to_date: formatDate(toDate),
       });
 
       // Only add employee_id parameter for non-employee users (admins)
-      const userRole = localStorage.getItem('userRole');
-      if (userRole !== 'employee' && selectedEmployee) {
-        params.append('employee_id', selectedEmployee);
+      const userRole = localStorage.getItem("userRole");
+      if (userRole !== "employee" && selectedEmployee) {
+        params.append("employee_id", selectedEmployee);
       }
 
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/reports?${params.toString()}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/reports?${params.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       if (response.ok) {
         const data = await response.json();
         setReports(data.reports || []);
       } else {
-        setError('Failed to fetch reports');
+        setError("Failed to fetch reports");
       }
     } catch (err) {
-      setError('Error fetching reports');
+      setError("Error fetching reports");
     } finally {
       setLoading(false);
     }
@@ -155,19 +181,22 @@ const Reports: React.FC = () => {
   // Fetch employees
   const fetchEmployees = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/employees`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/employees`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       if (response.ok) {
         const data = await response.json();
         setEmployees(data.employees || []);
       }
     } catch (err) {
-      console.error('Error fetching employees:', err);
+      console.error("Error fetching employees:", err);
     }
   };
 
@@ -192,13 +221,13 @@ const Reports: React.FC = () => {
   // Open edit modal
   const openEditModal = (report: Report) => {
     setSelectedReport(report);
-    setReport(report.report || '');
+    setReport(report.report || "");
     setStartTime(report.start_time ? new Date(report.start_time) : null);
     setEndTime(report.end_time ? new Date(report.end_time) : null);
     setBreakDuration(report.break_duration_in_minutes || 0);
-    setWorkingHours(report.todays_working_hours || '');
-    setTotalHours(report.todays_total_hours || '');
-    setNote(report.note || '');
+    setWorkingHours(report.todays_working_hours || "");
+    setTotalHours(report.todays_total_hours || "");
+    setNote(report.note || "");
     setShowEditModal(true);
   };
 
@@ -208,96 +237,110 @@ const Reports: React.FC = () => {
 
     try {
       // Calculate working hours and total hours
-      const calculatedWorkingHours = calculateWorkingHours(startTime, endTime, breakDuration);
+      const calculatedWorkingHours = calculateWorkingHours(
+        startTime,
+        endTime,
+        breakDuration
+      );
       const calculatedTotalHours = calculateTotalHours(startTime, endTime);
-      
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/reports/${selectedReport.id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          report,
-          start_time: startTime?.toISOString(),
-          end_time: endTime?.toISOString(),
-          break_duration_in_minutes: breakDuration,
-          todays_working_hours: calculatedWorkingHours,
-          todays_total_hours: calculatedTotalHours,
-          note,
-        }),
-      });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/reports/${selectedReport.id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            report,
+            start_time: startTime?.toISOString(),
+            end_time: endTime?.toISOString(),
+            break_duration_in_minutes: breakDuration,
+            todays_working_hours: calculatedWorkingHours,
+            todays_total_hours: calculatedTotalHours,
+            note,
+          }),
+        }
+      );
 
       if (response.ok) {
-        setSuccess('Report updated successfully');
+        setSuccess("Report updated successfully");
         setShowEditModal(false);
         fetchReports();
-        setTimeout(() => setSuccess(''), 3000);
+        setTimeout(() => setSuccess(""), 3000);
       } else {
-        setError('Failed to update report');
+        setError("Failed to update report");
       }
     } catch (err) {
-      setError('Error updating report');
+      setError("Error updating report");
     }
   };
 
   // Format time
   const formatTime = (timeString: string) => {
-    if (!timeString) return '';
-    
+    if (!timeString) return "";
+
     const time = new Date(timeString);
-    return time.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
+    return time.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
       hour12: true,
     });
   };
 
   // Format date
   const formatDate = (dateString: string) => {
-    if (!dateString) return '';
-    
+    if (!dateString) return "";
+
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
+    return date.toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
     });
   };
 
   // Check if user can edit report (today's report for employees, any for admins)
   const canEditReport = (report: Report) => {
-    const userRole = localStorage.getItem('userRole');
-    if (userRole === 'admin' || userRole === 'super_admin') return true;
-    
+    const userRole = localStorage.getItem("userRole");
+    if (userRole === "admin" || userRole === "super_admin") return true;
+
     const reportDate = new Date(report.created_at);
     const today = new Date();
     return reportDate.toDateString() === today.toDateString();
   };
 
   // Check if employee has already submitted a report for today
-  const userRole = localStorage.getItem('userRole');
-  const userId = localStorage.getItem('userId');
-  const today = new Date().toISOString().split('T')[0];
-  const hasSubmittedToday = reports.some(r => r.employee_id === userId && r.created_at && r.created_at.startsWith(today));
+  const userRole = localStorage.getItem("userRole");
+  const userId = localStorage.getItem("userId");
+  const today = new Date().toISOString().split("T")[0];
+  const hasSubmittedToday = reports.some(
+    (r) =>
+      r.employee_id === userId && r.created_at && r.created_at.startsWith(today)
+  );
 
   // Submit new report (employee)
   const handleSubmitReport = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitLoading(true);
     try {
-      console.log('Token being used:', token); 
-      console.log('Authorization header:', `Bearer ${token}`); 
-      
       // Calculate working hours and total hours
-      const calculatedWorkingHours = calculateWorkingHours(submitStartTime, submitEndTime, submitBreakDuration);
-      const calculatedTotalHours = calculateTotalHours(submitStartTime, submitEndTime);
-      
+      const calculatedWorkingHours = calculateWorkingHours(
+        submitStartTime,
+        submitEndTime,
+        submitBreakDuration
+      );
+      const calculatedTotalHours = calculateTotalHours(
+        submitStartTime,
+        submitEndTime
+      );
+
       const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/reports`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           report: submitReport,
@@ -309,25 +352,44 @@ const Reports: React.FC = () => {
           note: submitNote,
         }),
       });
-      console.log('Response status:', res.status); 
       if (res.ok) {
+        const newReport = await res.json();
+        // Use backend's returned report object for all fields
+        const backendReport = newReport.report || newReport;
+        setReports((prev) => [
+          {
+            id: backendReport.id || backendReport._id || Math.random().toString(),
+            employee_id: backendReport.employee_id || userId || '',
+            full_name: backendReport.full_name || '',
+            report: backendReport.report || submitReport,
+            start_time: backendReport.start_time || submitStartTime?.toISOString() || '',
+            end_time: backendReport.end_time || submitEndTime?.toISOString() || '',
+            break_duration_in_minutes: backendReport.break_duration_in_minutes ?? submitBreakDuration,
+            todays_working_hours: backendReport.todays_working_hours || calculatedWorkingHours,
+            todays_total_hours: backendReport.todays_total_hours || calculatedTotalHours,
+            created_at: backendReport.created_at || new Date().toISOString(),
+            note: backendReport.note || submitNote,
+          },
+          ...prev,
+        ]);
         setShowSubmitModal(false);
-        setSubmitReport('');
+        setSubmitReport("");
         setSubmitStartTime(null);
         setSubmitEndTime(null);
         setSubmitBreakDuration(0);
-        setSubmitNote('');
-        fetchReports();
-        setSuccess('Report submitted successfully');
-        setTimeout(() => setSuccess(''), 3000);
+        setSubmitNote("");
+        setSuccess("Report submitted successfully");
+        setTimeout(() => setSuccess(""), 3000);
+        // Background sync to ensure accuracy for both admin and employee
+        setTimeout(() => {
+          fetchReports();
+        }, 1000);
       } else {
         const errorData = await res.json();
-        console.log('Error response:', errorData); 
-        setError('Failed to submit report');
+        setError("Failed to submit report");
       }
     } catch (err) {
-      console.error('Submit report error:', err); 
-      setError('Error submitting report');
+      setError("Error submitting report");
     } finally {
       setSubmitLoading(false);
     }
@@ -347,13 +409,13 @@ const Reports: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Reports</h1>
           <p className="text-gray-600">View and manage employee reports</p>
         </div>
-        {userRole === 'employee' && (
+        {userRole === "employee" && (
           <button
             className="px-4 py-2 rounded bg-purple-700 text-white font-semibold hover:bg-purple-800 transition disabled:opacity-50"
             onClick={() => setShowSubmitModal(true)}
             disabled={hasSubmittedToday}
           >
-            {hasSubmittedToday ? 'Report Submitted' : 'Submit Report'}
+            {hasSubmittedToday ? "Report Submitted" : "Submit Report"}
           </button>
         )}
       </div>
@@ -374,7 +436,9 @@ const Reports: React.FC = () => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              From Date
+            </label>
             <DatePicker
               selected={fromDate ?? undefined}
               onChange={(date) => setFromDate(date)}
@@ -384,7 +448,9 @@ const Reports: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              To Date
+            </label>
             <DatePicker
               selected={toDate ?? undefined}
               onChange={(date) => setToDate(date)}
@@ -394,9 +460,11 @@ const Reports: React.FC = () => {
               maxDate={new Date()}
             />
           </div>
-          {localStorage.getItem('userRole') !== 'employee' && (
+          {localStorage.getItem("userRole") !== "employee" && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Employee</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Employee
+              </label>
               <select
                 className="w-full border rounded px-3 py-2"
                 value={selectedEmployee}
@@ -417,7 +485,7 @@ const Reports: React.FC = () => {
               disabled={buttonLoading}
               className="w-full px-4 py-2 bg-purple-700 text-white rounded hover:bg-purple-800 disabled:opacity-50"
             >
-              {buttonLoading ? 'Loading...' : 'Apply Filters'}
+              {buttonLoading ? "Loading..." : "Apply Filters"}
             </button>
           </div>
         </div>
@@ -432,26 +500,34 @@ const Reports: React.FC = () => {
               <div className="flex space-x-4 text-sm">
                 <div className="bg-green-50 px-3 py-1 rounded-full">
                   <span className="font-medium text-green-700">
-                    Total Working Hours: {currentReports.reduce((sum, report) => {
-                      const hours = report.todays_working_hours || '00:00';
-                      const [h, m] = hours.split(':').map(Number);
-                      return sum + h + m / 60;
-                    }, 0).toFixed(1)}h
+                    Total Working Hours:{" "}
+                    {currentReports
+                      .reduce((sum, report) => {
+                        const hours = report.todays_working_hours || "00:00";
+                        const [h, m] = hours.split(":").map(Number);
+                        return sum + h + m / 60;
+                      }, 0)
+                      .toFixed(1)}
+                    h
                   </span>
                 </div>
                 <div className="bg-blue-50 px-3 py-1 rounded-full">
                   <span className="font-medium text-blue-700">
-                    Total Hours: {currentReports.reduce((sum, report) => {
-                      const hours = report.todays_total_hours || '00:00';
-                      const [h, m] = hours.split(':').map(Number);
-                      return sum + h + m / 60;
-                    }, 0).toFixed(1)}h
+                    Total Hours:{" "}
+                    {currentReports
+                      .reduce((sum, report) => {
+                        const hours = report.todays_total_hours || "00:00";
+                        const [h, m] = hours.split(":").map(Number);
+                        return sum + h + m / 60;
+                      }, 0)
+                      .toFixed(1)}
+                    h
                   </span>
                 </div>
               </div>
             )}
           </div>
-          
+
           {loading ? (
             <div className="flex justify-center items-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
@@ -461,7 +537,7 @@ const Reports: React.FC = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    {localStorage.getItem('userRole') !== 'employee' && (
+                    {localStorage.getItem("userRole") !== "employee" && (
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Employee
                       </th>
@@ -493,7 +569,7 @@ const Reports: React.FC = () => {
                   {currentReports.length > 0 ? (
                     currentReports.map((report) => (
                       <tr key={report.id} className="hover:bg-gray-50">
-                        {localStorage.getItem('userRole') !== 'employee' && (
+                        {localStorage.getItem("userRole") !== "employee" && (
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {report.full_name}
                           </td>
@@ -511,10 +587,10 @@ const Reports: React.FC = () => {
                           {report.break_duration_in_minutes} mins
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                          {report.todays_working_hours || '00:00'}
+                          {report.todays_working_hours || "00:00"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
-                          {report.todays_total_hours || '00:00'}
+                          {report.todays_total_hours || "00:00"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <button
@@ -536,7 +612,14 @@ const Reports: React.FC = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={localStorage.getItem('userRole') === 'employee' ? 7 : 8} className="px-6 py-4 text-center text-gray-500">
+                      <td
+                        colSpan={
+                          localStorage.getItem("userRole") === "employee"
+                            ? 7
+                            : 8
+                        }
+                        className="px-6 py-4 text-center text-gray-500"
+                      >
                         No reports found
                       </td>
                     </tr>
@@ -562,7 +645,7 @@ const Reports: React.FC = () => {
                     key={i}
                     onClick={() => setCurrentPage(i + 1)}
                     className={`px-3 py-2 border rounded ${
-                      currentPage === i + 1 ? 'bg-purple-600 text-white' : ''
+                      currentPage === i + 1 ? "bg-purple-600 text-white" : ""
                     }`}
                   >
                     {i + 1}
@@ -601,7 +684,7 @@ const Reports: React.FC = () => {
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto px-6 py-4">
         <div className="space-y-4">
-          {localStorage.getItem('userRole') !== 'employee' && (
+          {localStorage.getItem("userRole") !== "employee" && (
             <div>
               <strong>Employee:</strong> {selectedReport.full_name}
             </div>
@@ -626,7 +709,10 @@ const Reports: React.FC = () => {
           </div>
           <div>
             <strong>Report:</strong>
-            <div className="mt-2 p-3 bg-gray-100 rounded" dangerouslySetInnerHTML={{ __html: selectedReport.report }} />
+            <div
+              className="mt-2 p-3 bg-gray-100 rounded"
+              dangerouslySetInnerHTML={{ __html: selectedReport.report }}
+            />
           </div>
           {selectedReport.note && (
             <div className="p-3 bg-red-100 border border-red-300 rounded">
@@ -654,230 +740,265 @@ const Reports: React.FC = () => {
 
       {/* Edit Report Modal */}
       <Modal
-        isOpen={showEditModal}
-        onRequestClose={() => setShowEditModal(false)}
-        contentLabel="Edit Report"
-        ariaHideApp={false}
-        className="bg-white rounded-lg shadow-lg max-w-4xl mx-auto mt-24 outline-none max-h-[90vh] flex flex-col"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4"
-      >
-        <div className="flex flex-col h-full">
-          <div className="p-6 pb-4">
-            <h2 className="text-xl font-bold mb-4">Edit Report</h2>
+  isOpen={showEditModal}
+  onRequestClose={() => setShowEditModal(false)}
+  contentLabel="Edit Report"
+  ariaHideApp={false}
+  className="bg-white rounded-lg shadow-lg max-w-4xl mx-auto mt-24 outline-none max-h-[90vh] flex flex-col"
+  overlayClassName="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4"
+>
+  <div className="flex flex-col h-[90vh]">
+    
+    {/* Fixed Header */}
+    <div className="p-6 pb-4 border-b bg-white z-10">
+      <h2 className="text-xl font-bold">Edit Report</h2>
+    </div>
+
+    {/* Scrollable Form Content */}
+    <div className="flex-1 overflow-y-auto px-6 py-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Report Textarea */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Report</label>
+          <textarea
+            value={report}
+            onChange={(e) => setReport(e.target.value)}
+            className="w-full border rounded px-3 py-2 h-32"
+            placeholder="Enter report details..."
+          />
+        </div>
+
+        {/* Time Inputs & Calculated Timing */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
+            <DatePicker
+              selected={startTime ?? undefined}
+              onChange={(date) => setStartTime(date)}
+              showTimeSelect
+              showTimeSelectOnly
+              timeIntervals={15}
+              timeCaption="Time"
+              dateFormat="h:mm aa"
+              className="w-full border rounded px-3 py-2"
+            />
           </div>
-          <div className="flex-1 overflow-y-auto px-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">End Time</label>
+            <DatePicker
+              selected={endTime ?? undefined}
+              onChange={(date) => setEndTime(date)}
+              showTimeSelect
+              showTimeSelectOnly
+              timeIntervals={15}
+              timeCaption="Time"
+              dateFormat="h:mm aa"
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Break Duration (minutes)</label>
+            <input
+              type="number"
+              value={breakDuration}
+              onChange={(e) => setBreakDuration(parseInt(e.target.value) || 0)}
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+
+          {/* Timing Summary */}
+          <div className="bg-gray-50 p-4 rounded-lg border">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Calculated Timing</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Report</label>
-                <textarea
-                  value={report}
-                  onChange={(e) => setReport(e.target.value)}
-                  className="w-full border rounded px-3 py-2 h-32"
-                  placeholder="Enter report details..."
-                />
+                <span className="font-medium text-gray-600">Working Hours:</span>
+                <span className="ml-2 font-semibold text-green-600">{workingHours || "00:00"}</span>
               </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
-                  <DatePicker
-                    selected={startTime ?? undefined}
-                    onChange={(date) => setStartTime(date)}
-                    showTimeSelect
-                    showTimeSelectOnly
-                    timeIntervals={15}
-                    timeCaption="Time"
-                    dateFormat="h:mm aa"
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">End Time</label>
-                  <DatePicker
-                    selected={endTime ?? undefined}
-                    onChange={(date) => setEndTime(date)}
-                    showTimeSelect
-                    showTimeSelectOnly
-                    timeIntervals={15}
-                    timeCaption="Time"
-                    dateFormat="h:mm aa"
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Break Duration (minutes)</label>
-                  <input
-                    type="number"
-                    value={breakDuration}
-                    onChange={(e) => setBreakDuration(parseInt(e.target.value) || 0)}
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
-                
-                {/* Calculated Timing Display */}
-                <div className="bg-gray-50 p-4 rounded-lg border">
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Calculated Timing</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-gray-600">Working Hours:</span>
-                      <span className="ml-2 font-semibold text-green-600">{workingHours || '00:00'}</span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-600">Total Hours:</span>
-                      <span className="ml-2 font-semibold text-blue-600">{totalHours || '00:00'}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Note</label>
-                  <textarea
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    className="w-full border rounded px-3 py-2"
-                    rows={3}
-                    placeholder="Add a note..."
-                  />
-                </div>
+              <div>
+                <span className="font-medium text-gray-600">Total Hours:</span>
+                <span className="ml-2 font-semibold text-blue-600">{totalHours || "00:00"}</span>
               </div>
             </div>
           </div>
-          <div className="p-6 pt-4 border-t bg-gray-50">
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={updateReport}
-                className="px-4 py-2 bg-purple-700 text-white rounded hover:bg-purple-800"
-              >
-                Update Report
-              </button>
-            </div>
+
+          {/* Optional Note */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Note</label>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              className="w-full border rounded px-3 py-2"
+              rows={3}
+              placeholder="Add a note..."
+            />
           </div>
         </div>
-      </Modal>
+      </div>
+    </div>
+
+    {/* Fixed Footer */}
+    <div className="p-6 pt-4 border-t bg-gray-50 z-10">
+      <div className="flex justify-end space-x-3">
+        <button
+          onClick={() => setShowEditModal(false)}
+          className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={updateReport}
+          className="px-4 py-2 bg-purple-700 text-white rounded hover:bg-purple-800"
+        >
+          Update Report
+        </button>
+      </div>
+    </div>
+
+  </div>
+</Modal>
+
 
       {/* Submit Report Modal (Employee) */}
       <Modal
-        isOpen={showSubmitModal}
-        onRequestClose={() => setShowSubmitModal(false)}
-        contentLabel="Submit Report"
-        ariaHideApp={false}
-        className="bg-white rounded-lg shadow-lg max-w-2xl mx-auto mt-24 outline-none max-h-[90vh] flex flex-col"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4"
-      >
-        <div className="flex flex-col h-full">
-          <div className="p-6 pb-4">
-            <h2 className="text-xl font-bold mb-4">Submit Daily Report</h2>
+  isOpen={showSubmitModal}
+  onRequestClose={() => setShowSubmitModal(false)}
+  contentLabel="Submit Report"
+  ariaHideApp={false}
+  className="bg-white rounded-lg shadow-lg max-w-2xl mx-auto mt-24 outline-none max-h-[90vh] flex flex-col"
+  overlayClassName="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4"
+>
+  {/* Modal Container with fixed height */}
+  <div className="flex flex-col h-[90vh]">
+
+    {/* Fixed Header */}
+    <div className="p-6 pb-4 border-b bg-white shrink-0">
+      <h2 className="text-xl font-bold">Submit Daily Report</h2>
+    </div>
+
+    {/* Scrollable Content */}
+    <div className="flex-1 overflow-y-auto px-6 py-4">
+      <form onSubmit={handleSubmitReport} className="space-y-6 pb-2">
+
+        <div>
+          <label className="block text-gray-700 mb-1">Report</label>
+          <textarea
+            className="w-full border rounded px-3 py-2 h-32"
+            value={submitReport}
+            onChange={(e) => setSubmitReport(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-gray-700 mb-1">Start Time</label>
+            <DatePicker
+              selected={submitStartTime ?? undefined}
+              onChange={(date) => setSubmitStartTime(date)}
+              showTimeSelect
+              showTimeSelectOnly
+              timeIntervals={15}
+              timeCaption="Time"
+              dateFormat="h:mm aa"
+              className="w-full border rounded px-3 py-2"
+              required
+            />
           </div>
-          <div className="flex-1 overflow-y-auto px-6">
-            <form onSubmit={handleSubmitReport} className="space-y-4">
-              <div>
-                <label className="block text-gray-700 mb-1">Report</label>
-                <textarea
-                  className="w-full border rounded px-3 py-2 h-32"
-                  value={submitReport}
-                  onChange={e => setSubmitReport(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-gray-700 mb-1">Start Time</label>
-                  <DatePicker
-                    selected={submitStartTime ?? undefined}
-                    onChange={date => setSubmitStartTime(date)}
-                    showTimeSelect
-                    showTimeSelectOnly
-                    timeIntervals={15}
-                    timeCaption="Time"
-                    dateFormat="h:mm aa"
-                    className="w-full border rounded px-3 py-2"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-1">End Time</label>
-                  <DatePicker
-                    selected={submitEndTime ?? undefined}
-                    onChange={date => setSubmitEndTime(date)}
-                    showTimeSelect
-                    showTimeSelectOnly
-                    timeIntervals={15}
-                    timeCaption="Time"
-                    dateFormat="h:mm aa"
-                    className="w-full border rounded px-3 py-2"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-1">Break Duration (minutes)</label>
-                  <input
-                    type="number"
-                    className="w-full border rounded px-3 py-2"
-                    value={submitBreakDuration}
-                    onChange={e => setSubmitBreakDuration(parseInt(e.target.value) || 0)}
-                    min={0}
-                    required
-                  />
-                </div>
-              </div>
-              
-              {/* Calculated Timing Display */}
-              <div className="bg-gray-50 p-4 rounded-lg border">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Calculated Timing</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-gray-600">Working Hours:</span>
-                    <span className="ml-2 font-semibold text-green-600">
-                      {calculateWorkingHours(submitStartTime, submitEndTime, submitBreakDuration) || '00:00'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-600">Total Hours:</span>
-                    <span className="ml-2 font-semibold text-blue-600">
-                      {calculateTotalHours(submitStartTime, submitEndTime) || '00:00'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 mb-1">Note (optional)</label>
-                <textarea
-                  className="w-full border rounded px-3 py-2"
-                  value={submitNote}
-                  onChange={e => setSubmitNote(e.target.value)}
-                  rows={2}
-                />
-              </div>
-            </form>
+          <div>
+            <label className="block text-gray-700 mb-1">End Time</label>
+            <DatePicker
+              selected={submitEndTime ?? undefined}
+              onChange={(date) => setSubmitEndTime(date)}
+              showTimeSelect
+              showTimeSelectOnly
+              timeIntervals={15}
+              timeCaption="Time"
+              dateFormat="h:mm aa"
+              className="w-full border rounded px-3 py-2"
+              required
+            />
           </div>
-          <div className="p-6 pt-4 border-t bg-gray-50">
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                className="px-4 py-2 rounded bg-gray-200 text-gray-700"
-                onClick={() => setShowSubmitModal(false)}
-                disabled={submitLoading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 rounded bg-purple-700 text-white font-semibold hover:bg-purple-800 transition"
-                disabled={submitLoading}
-                onClick={handleSubmitReport}
-              >
-                {submitLoading ? 'Submitting...' : 'Submit Report'}
-              </button>
+          <div>
+            <label className="block text-gray-700 mb-1">
+              Break Duration (minutes)
+            </label>
+            <input
+              type="number"
+              className="w-full border rounded px-3 py-2"
+              value={submitBreakDuration}
+              onChange={(e) =>
+                setSubmitBreakDuration(parseInt(e.target.value) || 0)
+              }
+              min={0}
+              required
+            />
+          </div>
+        </div>
+
+        {/* Calculated Timing */}
+        <div className="bg-gray-50 p-4 rounded-lg border">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">
+            Calculated Timing
+          </h3>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span className="font-medium text-gray-600">Working Hours:</span>
+              <span className="ml-2 font-semibold text-green-600">
+                {calculateWorkingHours(
+                  submitStartTime,
+                  submitEndTime,
+                  submitBreakDuration
+                ) || "00:00"}
+              </span>
+            </div>
+            <div>
+              <span className="font-medium text-gray-600">Total Hours:</span>
+              <span className="ml-2 font-semibold text-blue-600">
+                {calculateTotalHours(submitStartTime, submitEndTime) || "00:00"}
+              </span>
             </div>
           </div>
         </div>
-      </Modal>
+
+        <div>
+          <label className="block text-gray-700 mb-1">Note (optional)</label>
+          <textarea
+            className="w-full border rounded px-3 py-2"
+            value={submitNote}
+            onChange={(e) => setSubmitNote(e.target.value)}
+            rows={2}
+          />
+        </div>
+      </form>
+    </div>
+
+    {/* Fixed Footer */}
+    <div className="p-6 pt-4 border-t bg-gray-50 shrink-0">
+      <div className="flex justify-end gap-2">
+        <button
+          type="button"
+          className="px-4 py-2 rounded bg-gray-200 text-gray-700"
+          onClick={() => setShowSubmitModal(false)}
+          disabled={submitLoading}
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 rounded bg-purple-700 text-white font-semibold hover:bg-purple-800 transition"
+          disabled={submitLoading}
+          onClick={handleSubmitReport}
+        >
+          {submitLoading ? "Submitting..." : "Submit Report"}
+        </button>
+      </div>
+    </div>
+
+  </div>
+</Modal>
+
     </div>
   );
 };

@@ -47,19 +47,32 @@ const ProfileImage: React.FC<{
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
+    console.log('ProfileImage debug:', { profile, firstName, lastName });
+    
     if (profile && profile.startsWith('http')) {
+      console.log('Using full URL:', profile);
       setImageSrc(profile);
     } else if (profile) {
-      setImageSrc(`${import.meta.env.VITE_BASE_URL}/uploads/profiles/${profile}`);
+      // Handle both relative paths (starting with /) and just filenames
+      const profilePath = profile.startsWith('/') 
+        ? `${import.meta.env.VITE_BASE_URL}${profile}`
+        : `${import.meta.env.VITE_BASE_URL}/uploads/profiles/${profile}`;
+      console.log('Using profile path:', profilePath);
+      setImageSrc(profilePath);
     } else {
-      setImageSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=32`);
+      const initialsUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=32`;
+      console.log('Using initials URL:', initialsUrl);
+      setImageSrc(initialsUrl);
     }
   }, [profile, firstName, lastName]);
 
   const handleError = () => {
+    console.log('ProfileImage error for:', { profile, firstName, lastName, currentSrc: imageSrc });
     if (!hasError) {
       setHasError(true);
-      setImageSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=32`);
+      const initialsUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=32`;
+      console.log('Falling back to initials URL:', initialsUrl);
+      setImageSrc(initialsUrl);
     }
   };
 

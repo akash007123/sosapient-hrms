@@ -49,16 +49,22 @@ const ProfileImage: React.FC<{
     if (profile && profile.startsWith('http')) {
       setImageSrc(profile);
     } else if (profile) {
-      setImageSrc(`${import.meta.env.VITE_BASE_URL}/uploads/profiles/${profile}`);
+      // Handle both relative paths (starting with /) and just filenames
+      const profilePath = profile.startsWith('/') 
+        ? `${import.meta.env.VITE_BASE_URL}${profile}`
+        : `${import.meta.env.VITE_BASE_URL}/uploads/profiles/${profile}`;
+      setImageSrc(profilePath);
     } else {
-      setImageSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=32`);
+      const initialsUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=32`;
+      setImageSrc(initialsUrl);
     }
   }, [profile, firstName, lastName]);
 
   const handleError = () => {
     if (!hasError) {
       setHasError(true);
-      setImageSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=32`);
+      const initialsUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(`${firstName} ${lastName}`)}&background=6366f1&color=fff&size=32`;
+      setImageSrc(initialsUrl);
     }
   };
 
@@ -522,67 +528,67 @@ const Leaves: React.FC = () => {
                 </tr>
               ) : (
                 leaves.map((leave) => (
-                  <tr key={leave._id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <ProfileImage
-                          profile={leave.employee_id.profile}
-                          firstName={leave.employee_id.first_name}
-                          lastName={leave.employee_id.last_name}
-                          className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm"
-                        />
-                        <div className="ml-3">
-                          <div className="text-sm font-semibold text-gray-900">
-                            {leave.employee_id.first_name} {leave.employee_id.last_name}
+                    <tr key={leave._id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <ProfileImage
+                            profile={leave.employee_id.profile}
+                            firstName={leave.employee_id.first_name}
+                            lastName={leave.employee_id.last_name}
+                            className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm"
+                          />
+                          <div className="ml-3">
+                            <div className="text-sm font-semibold text-gray-900">
+                              {leave.employee_id.first_name} {leave.employee_id.last_name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {leave.employee_id.email}
+                            </div>
                           </div>
-                          <div className="text-sm text-gray-500">
-                            {leave.employee_id.email}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {formatDate(leave.from_date)} - {formatDate(leave.to_date)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900 max-w-xs truncate">
-                        {leave.reason}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        leave.is_half_day ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {leave.is_half_day ? 'Half Day' : 'Full Day'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(leave.status)}`}>
-                        {leave.status.charAt(0).toUpperCase() + leave.status.slice(1)}
-                      </span>
-                    </td>
-                    {user?.role === 'admin' && (
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => handleOpenEdit(leave)}
-                            className="text-blue-600 hover:text-blue-900 font-medium"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(leave._id, leave.reason)}
-                            className="text-red-600 hover:text-red-900 font-medium"
-                          >
-                            Delete
-                          </button>
                         </div>
                       </td>
-                    )}
-                  </tr>
-                ))
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {formatDate(leave.from_date)} - {formatDate(leave.to_date)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-900 max-w-xs truncate">
+                          {leave.reason}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          leave.is_half_day ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {leave.is_half_day ? 'Half Day' : 'Full Day'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(leave.status)}`}>
+                          {leave.status.charAt(0).toUpperCase() + leave.status.slice(1)}
+                        </span>
+                      </td>
+                      {user?.role === 'admin' && (
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => handleOpenEdit(leave)}
+                              className="text-blue-600 hover:text-blue-900 font-medium"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(leave._id, leave.reason)}
+                              className="text-red-600 hover:text-red-900 font-medium"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  ))
               )}
             </tbody>
           </table>

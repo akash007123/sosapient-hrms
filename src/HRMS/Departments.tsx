@@ -25,19 +25,28 @@ const Departments: React.FC = () => {
   const fetchDepartments = async () => {
     setLoading(true);
     try {
+      console.log('Departments: Fetching with token:', token ? 'Present' : 'Missing');
+      console.log('Departments: API URL:', `${import.meta.env.VITE_BASE_URL}/api/departments`);
+      
       const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/departments`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
+      
+      console.log('Departments: Response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
         setDepartments(data.departments || []);
       } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.log('Departments: Error response:', errorData);
         setError('Failed to fetch departments');
       }
     } catch (err) {
+      console.error('Departments: Fetch error:', err);
       setError('Error fetching departments');
     } finally {
       setLoading(false);

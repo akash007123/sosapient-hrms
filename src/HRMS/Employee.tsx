@@ -411,106 +411,92 @@ const Employee: React.FC = () => {
             </div>
           )}
 
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Employee
-                  </th>
+<div className="overflow-x-auto">
+  <table className="min-w-full divide-y divide-gray-200">
+    <thead className="bg-gray-50">
+      <tr>
+        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Employee</th>
+        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase hidden sm:table-cell">Department</th>
+        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase hidden md:table-cell">Email</th>
+        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase hidden md:table-cell">Joining Date</th>
+        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Actions</th>
+      </tr>
+    </thead>
+    <tbody className="bg-white divide-y divide-gray-100">
+      {employees.map((employee) => (
+        <tr key={employee._id} className="hover:bg-gray-50 transition-colors">
+          <td className="px-4 py-4 whitespace-nowrap">
+            <div className="flex items-center space-x-4">
+              {employee.profile && employee.profile.startsWith('/uploads/') ? (
+                <img
+                  src={`${import.meta.env.VITE_BASE_URL}${employee.profile}`}
+                  alt="Profile"
+                  className="w-10 h-10 rounded-full object-cover border"
+                  onError={(e) => {
+                    e.currentTarget.src = 'fallback-image-url';
+                  }}
+                />
+              ) : (
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                  {employee.first_name?.charAt(0)?.toUpperCase() || 'E'}
+                </div>
+              )}
+              <div>
+                <div className="text-sm font-medium text-gray-900">
+                  {employee.first_name} {employee.last_name}
+                </div>
+                <div className="text-xs text-gray-500 capitalize">{employee.role}</div>
+              </div>
+            </div>
+          </td>
 
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Department
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Joining Date
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {employees.map((employee) => (
-                  <tr key={employee._id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                      <div className="flex items-center">
-                        {employee.profile && employee.profile.startsWith('/uploads/') ? (
-                          <img 
-                            src={`${import.meta.env.VITE_BASE_URL}${employee.profile}`} 
-                            alt="Profile" 
-                            className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
-                            onError={(e) => {
-                              e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNEMzE3M0YiLz4KPHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEwIDUuODMzMzNDMTIuNzYxNCA1LjgzMzMzIDE1IDguMDcxOTMgMTUgMTAuODMzM0MxNSAxMy41OTQ3IDEyLjc2MTQgMTUuODMzMyAxMCAxNS44MzMzQzcuMjM4NTggMTUuODMzMyA1IDEzLjU5NDcgNSAxMC44MzMzQzUgOC4wNzE5MyA3LjIzODU4IDUuODMzMzMgMTAgNS44MzMzM1oiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0xMCAxNy41QzEzLjIyMTcgMTcuNSAxNS44NzUgMTkuNzI5NyAxNi4yNSA0LjE2NjdDMTYuMjUgMy4yNSAxNS41IDIuNSAxNC41ODMzIDIuNUg1LjQxNjY3QzQuNSAyLjUgMy43NSA0LjE2NjcgMy43NSA1LjA4MzMzQzQuMTI1IDE5LjcyOTcgNi43NzgyNSAxNy41IDEwIDE3LjVaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+';
-                            }}
-                          />
-                        ) : (
-                          <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                            {employee.first_name?.charAt(0)?.toUpperCase() || 'E'}
-                          </div>
-                        )}
-                      </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-semibold text-gray-900">
-                            {employee.first_name} {employee.last_name}
-                          </div>
-                          <div className="text-sm text-gray-500 capitalize">
-                            {employee.role}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {employee.department || 'N/A'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {employee.email}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {formatDate(employee.joining_date)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center ">
-                        <button
-                          onClick={() => handleView(employee)}
-                          className="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-100 rounded-lg transition-colors"
-                          title="View Employee"
-                        >
-                          <FontAwesomeIcon icon={faEye} />
-                        </button>
-                        <button
-                          onClick={() => handleEdit(employee)}
-                          className="text-green-600 hover:text-green-900 p-2 hover:bg-green-100 rounded-lg transition-colors"
-                          title={user?.role === 'employee' ? 'Edit Profile' : 'Edit Employee'}
-                        >
-                          <FontAwesomeIcon icon={faEdit} />
-                        </button>
-                        {isAdmin && (
-                          <button
-                            onClick={() => handleDelete(employee)}
-                            className="text-red-600 hover:text-red-900 p-2 hover:bg-red-100 rounded-lg transition-colors"
-                            title="Delete Employee"
-                          >
-                            <FontAwesomeIcon icon={faTrash} />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <td className="px-4 py-4 whitespace-nowrap hidden sm:table-cell">
+            <span className="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+              {employee.department || 'N/A'}
+            </span>
+          </td>
+
+          <td className="px-4 py-4 text-sm text-gray-900 hidden md:table-cell">
+            {employee.email}
+          </td>
+
+          <td className="px-4 py-4 text-sm text-gray-900 hidden md:table-cell">
+            {formatDate(employee.joining_date)}
+          </td>
+
+          <td className="px-4 py-4">
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => handleView(employee)}
+                className="text-blue-600 hover:text-blue-900 p-2 rounded-lg hover:bg-blue-100 transition-colors"
+                title="View"
+              >
+                <FontAwesomeIcon icon={faEye} />
+              </button>
+              <button
+                onClick={() => handleEdit(employee)}
+                className="text-green-600 hover:text-green-900 p-2 rounded-lg hover:bg-green-100 transition-colors"
+                title={user?.role === 'employee' ? 'Edit Profile' : 'Edit Employee'}
+              >
+                <FontAwesomeIcon icon={faEdit} />
+              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => handleDelete(employee)}
+                  className="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-100 transition-colors"
+                  title="Delete"
+                >
+                  <FontAwesomeIcon icon={faTrash} />
+                </button>
+              )}
+            </div>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
 
           {employees.length === 0 && !loading && (
             <div className="text-center py-12">
